@@ -34,7 +34,7 @@ themeToggleBtn.addEventListener('click', () => {
 const map = L.map('map', {
   zoomControl: false,
   scrollWheelZoom: true,
-}).setView([35.4437, 139.638], 13);
+}).setView([35.6812, 139.7671], 13);
 
 // ズームコントロールを右下に配置
 L.control.zoom({ position: 'bottomright' }).addTo(map);
