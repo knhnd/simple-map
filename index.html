@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Field Map</title>
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <!-- アプリのスタイル -->
+    <link rel="stylesheet" href="./style/style.css" />
+  </head>
+  <body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar">
+      <!-- ロゴ・タイトル -->
+      <div class="nav-brand">
+        <div class="nav-icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+        </div>
+        <h1 class="nav-title">Field Map</h1>
+      </div>
+
+      <!-- 検索フォーム -->
+      <div class="search-wrapper">
+        <div class="search-inner">
+          <input type="text" id="search-input" placeholder="場所を検索..." class="search-input" />
+          <button id="search-button" class="search-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ダークモード切替 -->
+      <button id="theme-toggle" class="theme-toggle" title="モード切替">
+        <svg
+          id="theme-icon-dark"
+          class="theme-icon hidden"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          width="20"
+          height="20"
+        >
+          <path
+            d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <svg
+          id="theme-icon-light"
+          class="theme-icon hidden"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          width="20"
+          height="20"
+        >
+          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+        </svg>
+      </button>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+      <!-- 地図セクション -->
+      <section class="map-section">
+        <div id="map"></div>
+
+        <!-- 現在地ボタン -->
+        <div class="locate-wrapper">
+          <button id="locate-button" class="locate-button" title="現在地に移動">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- 情報パネル -->
+        <div id="info-panel" class="info-panel hidden">
+          <div class="panel-header">
+            <h3 id="panel-title" class="panel-title">地点情報</h3>
+            <button id="panel-close" class="panel-close">&times;</button>
+          </div>
+          <p id="panel-content" class="panel-content"></p>
+        </div>
+      </section>
+
+      <!-- 使い方ガイド -->
+      <section class="guide-section">
+        <h2 class="guide-heading">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          使い方
+        </h2>
+
+        <div class="guide-grid">
+          <div class="guide-item">
+            <div class="guide-icon guide-icon--green">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+            <h3 class="guide-item-title">場所を探す</h3>
+            <p class="guide-item-desc">上の検索バーに駅名や住所を入力して検索できます。</p>
+          </div>
+
+          <div class="guide-item">
+            <div class="guide-icon guide-icon--blue">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"
+                />
+              </svg>
+            </div>
+            <h3 class="guide-item-title">地点を確認する</h3>
+            <p class="guide-item-desc">地図上の任意の場所をクリックすると住所が表示されます。</p>
+          </div>
+
+          <div class="guide-item">
+            <div class="guide-icon guide-icon--purple">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
+              </svg>
+            </div>
+            <h3 class="guide-item-title">現在地を表示</h3>
+            <p class="guide-item-desc">地図右上のボタンでGPSを使って現在地に移動します。</p>
+          </div>
+        </div>
+
+        <div class="guide-note">
+          <p>
+            ※ 本アプリは OpenStreetMap と Nominatim API
+            を使用しています。位置情報の精度はデバイスのGPS環境に依存します。
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- フッター -->
+    <footer class="footer">
+      <p>Field Map &mdash; Built with Leaflet &amp; OpenStreetMap</p>
+    </footer>
+
+    <!-- トースト通知 -->
+    <div id="toast" class="toast">メッセージ</div>
+
+    <!-- Leaflet JS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+
+    <!-- アプリのスクリプト -->
+    <script src="./src/map.js"></script>
+  </body>
+</html>
